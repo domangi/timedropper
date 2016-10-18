@@ -23,7 +23,10 @@
                     primaryColor: "#1977CC",
                     borderColor: "#1977CC",
                     backgroundColor: "#FFF",
-                    textColor: '#555'
+                    textColor: '#555',
+                    format24Hours: false,
+                    earliestTime: null,
+                    latestTime: null
 
                 }, options);
 
@@ -111,7 +114,7 @@
 
                         t.attr('data-id', _td_num(h));
 
-                        if (_td_options.meridians) {
+                        if (_td_options.meridians && !_td_options.format24Hours) {
 
                             if (h >= 12 && h < 24) {
                                 _td_c.find('.td-icon-pm').addClass('td-on');
@@ -147,19 +150,24 @@
                         _td_h = _td_c.find('.td-time span:first').attr('data-id'),
                         _td_m = _td_c.find('.td-time span:last').attr('data-id');
 
-                    if (Math.round(_td_h) >= 12 && Math.round(_td_h) < 24) {
-                        var
-                            h = Math.round(_td_h) - 12,
-                            a = 'pm',
-                            A = 'PM';
-                    } else {
-                        var
-                            h = Math.round(_td_h),
-                            a = 'am',
-                            A = 'AM';
-                    }
+                    if(!_td_options.format24Hours){
+                        if (Math.round(_td_h) >= 12 && Math.round(_td_h) < 24) {
+                            var
+                                h = Math.round(_td_h) - 12,
+                                a = 'pm',
+                                A = 'PM';
+                        } else {
+                            var
+                                h = Math.round(_td_h),
+                                a = 'am',
+                                A = 'AM';
+                        }    
 
-                    if (h == 0) h = 12;
+                        if (h == 0) h = 12;
+
+                    } else {
+                       h = Math.round(_td_h) 
+                    }
 
                     var
                         str =
@@ -170,11 +178,103 @@
                         .replace(/\b(HH)\b/g, _td_num(Math.round(_td_h)))
                         .replace(/\b(hh)\b/g, _td_num(Math.round(h)))
                         .replace(/\b(mm)\b/g, _td_num(Math.round(_td_m)))
-                        .replace(/\b(a)\b/g, a)
-                        .replace(/\b(A)\b/g, A);
+
+                        if(_td_options.format24Hours) {
+                            str = str
+                            .replace(/\b(a)\b/g, "")
+                            .replace(/\b(A)\b/g, "")
+                        } else {
+                            str = str
+                            .replace(/\b(a)\b/g, a)
+                            .replace(/\b(A)\b/g, A);
+                        }
+                        
 
                     _td_input.val(str);
 
+
+                },
+                _td_check_time_range = function() {
+                    var
+                        _td_h = _td_c.find('.td-time span:first').attr('data-id'),
+                        _td_m = _td_c.find('.td-time span:last').attr('data-id');
+
+                    _td_set_time_in_range(_td_h, _td_m);
+                },
+                _td_set_time_in_range = function(hour, minutes) {
+                    // check time validity
+                    if(hour && minutes && parseInt(hour) >= 0 && parseInt(hour) <= 23 &&  parseInt(minutes) >= 0 &&  parseInt(minutes) <= 59) {
+                        hour = parseInt(hour);
+                        m = parseInt(minutes);
+
+                        if(_td_options.earliestTime){
+                            var earliestHour = parseInt(_td_options.earliestTime.split(":")[0]);
+                            var earliestMinute = parseInt(_td_options.earliestTime.split(":")[1]);
+
+                            if(hour < earliestHour){
+                                hour = earliestHour;
+                                m = earliestMinute;
+                            } else {
+                                if(hour == earliestHour && m < earliestMinute) {
+                                    m = earliestMinute;
+                                }
+                            }
+                        }
+
+                        if(_td_options.latestTime){
+                            var latestHour = parseInt(_td_options.latestTime.split(":")[0]);
+                            var latestMinute = parseInt(_td_options.latestTime.split(":")[1]);
+
+                            if(hour > latestHour){
+                                hour = latestHour;
+                                m = latestMinute;
+                            } else {
+                                if(hour == latestHour && m > latestMinute) {
+                                    m = latestMinute;
+                                }
+                            }
+                        }
+
+                        _td_set_time(hour, m);
+                    }
+                },
+                _td_merdian_hour = function(h){
+                    if (h >= 12 && h < 24) {
+                        return h - 12;
+                    } else {
+                        return h;
+                    }    
+                },
+                _td_set_time = function(h, m) {
+                    var
+                    _td_span_h = _td_c.find('.td-time span:first'),
+                    _td_span_m = _td_c.find('.td-time span:last'),
+                    hour, minutes;
+
+                    hour = h;
+                    minutes = m;
+
+                    if(_td_options.meridians)
+                        hour = _td_merdian_hour(hour);
+
+                    if(h < 10)
+                        hour = "0" + h;
+
+                    if(m < 10)
+                        minutes = "0" + m;
+
+                    _td_span_h.attr('data-id', h).text(hour);
+                    _td_span_m.attr('data-id', m).text(minutes);
+
+                    if(!$(_td_span_m).hasClass("on")) {
+                        _td_event_deg = Math.round((h * 360 / 23));
+                    } else {
+                        _td_event_deg = Math.round((m * 360 / 59));
+                    } 
+                    _td_rotation(_td_event_deg);
+                    _td_wheel_deg = _td_event_deg;
+                    _td_init_deg = -1;
+                    _td_c.find('.td-lancette div:first').css('transform', 'rotate(' + Math.round((m * 360 / 59)) + 'deg)');
 
                 };
 
@@ -286,7 +386,6 @@
             }
 
             $(document).on('touchend mouseup', function() {
-
                 if (_td_input_on) {
 
                     _td_input_on = false;
@@ -298,6 +397,9 @@
 
                     _td_c.find('.td-deg').addClass('td-n');
                     _td_c.find('.td-select').addClass('td-rubber');
+
+                    if(_td_options.earliestTime || _td_options.latestTime)
+                        _td_check_time_range();
 
                 }
 
@@ -351,17 +453,7 @@
 
                 }
 
-                _td_span_h.attr('data-id', h).text(h);
-                _td_span_m.attr('data-id', m).text(m);
-
-                _td_event_deg = Math.round((h * 360 / 23));
-
-                _td_c.find('.td-lancette div:first').css('transform', 'rotate(' + Math.round((m * 360 / 59)) + 'deg)');
-
-                _td_rotation(_td_event_deg);
-                _td_wheel_deg = _td_event_deg;
-                _td_init_deg = -1;
-
+                _td_set_time_in_range(h,m);
 
             }
 
