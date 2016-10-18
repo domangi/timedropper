@@ -9,16 +9,16 @@ timedropper is a jQuery UI timepicker. Manage time input fields in a standard fo
 
 ## use 24 hour format
 
-```
-<script>$( "#alarm" ).timeDropper({format24Hours: true});</script>
+```javascript
+$( "#alarm" ).timeDropper({format24Hours: true})
 ```
 You will see time in 24 hour format on the clock and in the input field.
 
 
 ## set a earliest time border
 
-```
-<script>$( "#alarm" ).timeDropper({earliestTime: "08:00"});</script>
+```javascript
+$( "#alarm" ).timeDropper({earliestTime: "08:00"})
 
 ```
 
@@ -28,8 +28,8 @@ When a user chooses a time below the limit, then the time is setted to the earli
 
 ## set a latest time border
 
-```
-<script>$( "#alarm" ).timeDropper({latestTime: "20:00"});</script>
+```javascript
+$( "#alarm" ).timeDropper({latestTime: "20:00"})
 ```
 
 When a user chooses a time above the limit, then the time is setted to the latest time. E.g. a if you set the latestTime option to 20:00 and a user chooses 21:30, then time goes up to 20:00.
