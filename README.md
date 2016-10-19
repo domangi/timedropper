@@ -35,3 +35,10 @@ $( "#alarm" ).timeDropper({latestTime: "20:00"})
 When a user chooses a time above the limit, then the time is setted to the latest time. E.g. a if you set the latestTime option to 20:00 and a user chooses 21:30, then time goes up to 20:00.
 
 
+## Added time dropper with single control for both hours and minutes
+
+```javascript
+$( "#alarm" ).timeDropOne({minutesIntervalPerHour: 4})
+```
+
+This will allow users to set time in intervals of 1/4 hours (15 minutes). To set time in intervals of 30 minutes set minutesIntervalPerHour to 2 (1/2 hour)

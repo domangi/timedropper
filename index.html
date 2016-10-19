@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timedropper Test</title>
+    <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <script src="timedropone.js"></script>
+    <link rel="stylesheet" type="text/css" href="timedropper.css">
+</head>
+<body>
+    <input type="text" id="alarm" value="18:00" />
+    <script>$( "#alarm" ).timeDropOne({minutesIntervalPerHour:2, format24Hours: true, setCurrentTime: false, earliestTime: "10:30", latestTime: "20:30"});</script>
+</body>
+</html>
